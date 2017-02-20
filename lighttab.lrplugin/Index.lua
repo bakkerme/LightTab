@@ -8,11 +8,10 @@ local LrFunctionContext = import "LrFunctionContext"
 logger:enable( "print" ) -- or "logfile"
 -- JSON = loadfile(LrPathUtils.child(_PLUGIN.path, "lib/JSON.lua")) 
 JSON = require "JSON.lua";
+validDevelopmentParams = require "developmentParams.lua"
 
 
 
---
---
 -- if WIN_ENV == true then
 --      			command = '"' .. LrPathUtils.child( LrPathUtils.child( _PLUGIN.path, "win" ), "LightroomCreatorXMP.exe" )
 -- 		quotedCommand = '"' .. command .. '"'
