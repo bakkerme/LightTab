@@ -3,10 +3,12 @@ local LrLogger = import 'LrLogger'
 local logger = LrLogger( 'LIGHTTAB' )
 local LrSocket = import "LrSocket"
 local LrTasks = import "LrTasks"
+local LrPathUtils = import "LrPathUtils"
 local LrFunctionContext = import "LrFunctionContext"
 logger:enable( "print" ) -- or "logfile"
+-- JSON = loadfile(LrPathUtils.child(_PLUGIN.path, "lib/JSON.lua")) 
+JSON = require "JSON.lua";
 
-JSON = (loadfile "JSON.lua")() -- one-time load of the routines
 
 
 --
@@ -23,12 +25,17 @@ JSON = (loadfile "JSON.lua")() -- one-time load of the routines
 -- 	renditionToSatisfy:renditionIsDone( false, "Failed to contact XMP Application" )
 -- end
 
+local min,max = LrDevelopController.getRange("Temperature")
+logger:trace( "Range")
+logger:trace( min )
+logger:trace( max )
+
 LrTasks.startAsyncTask( function()
   LrFunctionContext.callWithContext( 'socket_remote', function( context )
     local running = true
     local sender = LrSocket.bind {
       functionContext = context,
-      port = 48763, -- (let the OS assign the port)
+      port = 48763,
       mode = "receive",
       plugin = _PLUGIN,
       onConnecting = function( socket, port )
@@ -39,6 +46,7 @@ LrTasks.startAsyncTask( function()
       end,
       onMessage = function( socket, message )
         logger:trace(message)
+        handleImageChangeEvent(message)
       end,
       onClosed = function( socket )
         running = false
@@ -56,20 +64,19 @@ LrTasks.startAsyncTask( function()
   end )
 end )
 
-function handleImageChangeEvent(message) {
+function handleImageChangeEvent(message)
   local value = JSON:decode(message)
-  setImageParamValue(value.param, value.value);
-}
+  logger:trace('handle change')
+  logger:trace(value["value"])
+  setImageParamValue(value["param"], value["value"])
+end
 
-function setImageParamValue(devParam, value) {
+
+function setImageParamValue(devParam, value)
+  logger:trace(devParam, value);
   LrDevelopController.setValue(devParam, value)
-}
+end
 
--- local min,max = LrDevelopController.getRange("Temperature")
-
--- logger:trace( "Range")
--- logger:trace( min )
--- logger:trace( max )
 
 -- LrDevelopController.increment("Temperature")
 -- LrDevelopController.increment("Temperature")
