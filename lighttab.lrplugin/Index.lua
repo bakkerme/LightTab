@@ -11,7 +11,6 @@ JSON = require "JSON.lua";
 validDevelopmentParams = require "developmentParams.lua"
 
 
-
 -- if WIN_ENV == true then
 --      			command = '"' .. LrPathUtils.child( LrPathUtils.child( _PLUGIN.path, "win" ), "LightroomCreatorXMP.exe" )
 -- 		quotedCommand = '"' .. command .. '"'
@@ -67,7 +66,10 @@ function handleImageChangeEvent(message)
   local value = JSON:decode(message)
   logger:trace('handle change')
   logger:trace(value["value"])
-  setImageParamValue(value["param"], value["value"])
+  
+  if developmentParams[value["param"]] then
+    setImageParamValue(value["param"], value["value"])
+  end
 end
 
 
