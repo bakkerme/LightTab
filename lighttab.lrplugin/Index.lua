@@ -1,3 +1,8 @@
+local Require = require "Require".path ("../debuggingtoolkit.lrdevplugin").reload()
+local Debug = require "Debug"
+require "strict"
+
+
 local LrDevelopController = import 'LrDevelopController'
 local LrLogger = import 'LrLogger'
 local logger = LrLogger( 'LIGHTTAB' )
@@ -8,6 +13,9 @@ local LrFunctionContext = import "LrFunctionContext"
 logger:enable( "print" ) -- or "logfile"
 JSON = require "JSON.lua";
 developmentParams = require "developmentParams.lua"
+
+-- Debug.pauseIfAsked()
+
 
 
 -- if WIN_ENV == true then
@@ -27,8 +35,9 @@ developmentParams = require "developmentParams.lua"
 -- logger:trace( min )
 -- logger:trace( max )
 
-LrTasks.startAsyncTask( function()
-  LrFunctionContext.callWithContext( 'socket_remote', function( context )
+LrTasks.startAsyncTask(Debug.showErrors(  function()
+  Debug.callWithContext( 'socket_remote', function( context )
+  -- LrFunctionContext.callWithContext( 'socket_remote', function( context )
     local running = true
     local sender = LrSocket.bind {
       functionContext = context,
@@ -59,7 +68,7 @@ LrTasks.startAsyncTask( function()
     end
     sender:close()
   end )
-end )
+end ))
 
 function handleImageChangeEvent(message)
   local value = JSON:decode(message)
