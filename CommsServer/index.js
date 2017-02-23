@@ -31,7 +31,7 @@ client.connect(pluginPort, host, function () {
 client.on('data', function (data) {
 	console.log('DATA: ' + data);
 	// Close the client socket completely
-	client.destroy();
+	// client.destroy();
 });
 
 // Add a 'close' event handler for the client socket

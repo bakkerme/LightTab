@@ -6,9 +6,8 @@ local LrTasks = import "LrTasks"
 local LrPathUtils = import "LrPathUtils"
 local LrFunctionContext = import "LrFunctionContext"
 logger:enable( "print" ) -- or "logfile"
--- JSON = loadfile(LrPathUtils.child(_PLUGIN.path, "lib/JSON.lua")) 
 JSON = require "JSON.lua";
-validDevelopmentParams = require "developmentParams.lua"
+developmentParams = require "developmentParams.lua"
 
 
 -- if WIN_ENV == true then
@@ -23,10 +22,10 @@ validDevelopmentParams = require "developmentParams.lua"
 -- 	renditionToSatisfy:renditionIsDone( false, "Failed to contact XMP Application" )
 -- end
 
-local min,max = LrDevelopController.getRange("Temperature")
-logger:trace( "Range")
-logger:trace( min )
-logger:trace( max )
+-- local min,max = LrDevelopController.getRange("Temperature")
+-- logger:trace( "Range")
+-- logger:trace( min )
+-- logger:trace( max )
 
 LrTasks.startAsyncTask( function()
   LrFunctionContext.callWithContext( 'socket_remote', function( context )
@@ -65,9 +64,10 @@ end )
 function handleImageChangeEvent(message)
   local value = JSON:decode(message)
   logger:trace('handle change')
-  logger:trace(value["value"])
+  logger:trace(value["param"])
   
-  if developmentParams[value["param"]] then
+  if developmentParams:isAvailableDevelopmentParam(value["param"]) then
+    logger:trace("Available, applying now!")
     setImageParamValue(value["param"], value["value"])
   end
 end
@@ -77,19 +77,3 @@ function setImageParamValue(devParam, value)
   logger:trace(devParam, value);
   LrDevelopController.setValue(devParam, value)
 end
-
-
--- LrDevelopController.increment("Temperature")
--- LrDevelopController.increment("Temperature")
--- LrDevelopController.increment("Temperature")
--- LrDevelopController.increment("Temperature")
--- LrDevelopController.increment("Temperature")
--- LrDevelopController.increment("Temperature")
--- LrDevelopController.increment("Temperature")
--- LrDevelopController.increment("Temperature")
--- LrDevelopController.increment("Temperature")
--- LrDevelopController.increment("Temperature")
--- LrDevelopController.increment("Temperature")
--- LrDevelopController.increment("Temperature")
--- LrDevelopController.increment("Temperature")
--- LrDevelopController.increment("Temperature")
