@@ -28,6 +28,11 @@ Ltsocket = require "socket.lua"
 -- logger:trace( max )
 --Start the socket reciever
 
+local setImageParamValue = function (devParam, value)
+    logger:trace(devParam, value);
+    LrDevelopController.setValue(devParam, value)
+end
+
 local handleImageChangeEvent = function (message)
     local value = JSON:decode(message)
     logger:trace('handle change')
@@ -37,12 +42,6 @@ local handleImageChangeEvent = function (message)
         logger:trace("Available, applying now!")
         setImageParamValue(value["param"], value["value"])
     end
-end
-
-
-local setImageParamValue = function (devParam, value)
-    logger:trace(devParam, value);
-    LrDevelopController.setValue(devParam, value)
 end
 
 Ltsocket.startReciever(handleImageChangeEvent)

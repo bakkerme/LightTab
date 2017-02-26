@@ -1,6 +1,6 @@
 {
   "name": "LightTabComms",
-  "version": "1.0",
+  "version": "1.0.0",
   "description": "Communicates between Lightab plugin and server",
   "author": "Brandon Bakker <brandon@bdmd.com.au>",
   "scripts": {
@@ -15,10 +15,9 @@
     "url": "https://github.com/bakkerme/lighttab/issues"
   },
   "dependencies": {
-    "lodash": "^4.x"
+    "lodash": "^4.x",
+    "socket.io": "1.7.x"
   },
-  "devDependencies": {
-    "babel-cli": "^6.23.0"
-  },
+  "devDependencies": { },
   "preferGlobal": true
 }
