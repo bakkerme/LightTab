@@ -12,5 +12,5 @@ console.log(LocalSocket, RemoteSocket);
 let localSocket = new LocalSocket();
 let remoteSocket = new RemoteSocket();
 
-localSocket.openSocket();
-// remoteSocket.openSocket();
+// localSocket.openSocket();
+remoteSocket.openSocket();

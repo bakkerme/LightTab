@@ -16,7 +16,8 @@
   },
   "dependencies": {
     "lodash": "^4.x",
-    "socket.io": "1.7.x"
+    "socket.io": "1.7.x",
+    "socket.io-client": "1.7.x"
   },
   "devDependencies": { },
   "preferGlobal": true
