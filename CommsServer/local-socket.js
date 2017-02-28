@@ -2,8 +2,9 @@
 let _ = require('lodash');
 let net = require('net');
 
-let pluginPort = 48763;
-let host = '127.0.0.1';
+const pluginPort = 48763;
+const host = '127.0.0.1';
+let socketClient = null;
 class LocalSocket {
   constructor() {
     if (typeof pluginPort !== 'number') {
@@ -16,28 +17,33 @@ class LocalSocket {
     }
   }
 
+  sendObject(object) {
+    socketClient.write(JSON.stringify(object) + '\n');
+  }
+
   openSocket() {
-    let client = new net.Socket();
-    client.connect(pluginPort, host, function () {
+    socketClient = new net.Socket();
+    socketClient.connect(pluginPort, host, function () {
+      
       console.log('CONNECTED TO: ' + host + ':' + pluginPort);
       let value = {
       	param: 'Tint',
       	value: 90
       };
 
-      client.write(JSON.stringify(value) + '\n');
+      this.sendObject(value);
     });
 
     // Add a 'data' event handler for the client socket
     // data is what the server sent to this socket
-    client.on('data', function (data) {
+    socketClient.on('data', function (data) {
       console.log('DATA: ' + data);
       // Close the client socket completely
       // client.destroy();
     });
 
     // Add a 'close' event handler for the client socket
-    client.on('close', function () {
+    socketClient.on('close', function () {
       console.log('Connection closed');
     });
   }

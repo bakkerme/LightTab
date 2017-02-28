@@ -1,6 +1,8 @@
 "strict mode";
 
-let pluginPort = 48765;
+const pluginPort = 48765;
+const io = require('socket.io')();
+let onMessageReceivedCallback = null
 class RemoteSocket {
   constructor() {
     if (typeof pluginPort !== 'number') {
@@ -13,21 +15,28 @@ class RemoteSocket {
     }
   }
 
+  //@TODO probably genericise this out
+  registerOnMessageReceived(func) {
+    onMessageReceivedCallback = func;
+  }
+
+  onMessageReceive(data) {
+    console.log(data);
+    onMessageReceivedCallback(data);
+    io.emit('message', 'Hello right back!');
+  }
+
+  onDisconnect() {
+    console.log('disconnect');
+  }
+
   openSocket() {
-    let io = require('socket.io')();
     io.on('connection', function (client) {
       console.log('connected');
-      client.on('message', (data) => {
-        console.log(data);
-        io.emit('message', 'Hello right back!');
-      });
-      client.on('event', (data) => {
-        console.log(data);
-      });
-      client.on('disconnect', function () { 
-        console.log('disconnect');
-      });
+      client.on('message', (data) => this.onMessageReceive(data));
+      client.on('disconnect', () => onDisconnect());
     });
+    
     io.listen(48765);
   }
 }
