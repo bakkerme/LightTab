@@ -12,5 +12,10 @@ console.log(LocalSocket, RemoteSocket);
 let localSocket = new LocalSocket();
 let remoteSocket = new RemoteSocket();
 
-// localSocket.openSocket();
+localSocket.openSocket();
+remoteSocket.registerOnMessageReceived((data) => relayMessageToLocalSocket(data))
 remoteSocket.openSocket();
+
+function relayMessageToLocalSocket(message) {
+  localSocket.sendObject(message);
+}

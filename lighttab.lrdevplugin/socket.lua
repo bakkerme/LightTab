@@ -30,6 +30,7 @@ ltsocket.startReciever = function (onMessage)
           logger:trace('successful connection');
         end,
         onMessage = function( socket, message )
+          logger:trace('The message is:')
           logger:trace(message)
           onMessage(message)
         end,

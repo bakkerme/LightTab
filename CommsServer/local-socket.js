@@ -24,14 +24,7 @@ class LocalSocket {
   openSocket() {
     socketClient = new net.Socket();
     socketClient.connect(pluginPort, host, function () {
-      
       console.log('CONNECTED TO: ' + host + ':' + pluginPort);
-      let value = {
-      	param: 'Tint',
-      	value: 90
-      };
-
-      this.sendObject(value);
     });
 
     // Add a 'data' event handler for the client socket

@@ -1,7 +1,7 @@
 {
   "name": "LightTabComms",
   "version": "1.0.0",
-  "description": "Communicates between Lightab plugin and server",
+  "description": "Communicates between Lightab plugin and app",
   "author": "Brandon Bakker <brandon@bdmd.com.au>",
   "scripts": {
     "start": "node index.js"

@@ -23,7 +23,6 @@ class RemoteSocket {
   onMessageReceive(data) {
     console.log(data);
     onMessageReceivedCallback(data);
-    io.emit('message', 'Hello right back!');
   }
 
   onDisconnect() {
@@ -31,10 +30,10 @@ class RemoteSocket {
   }
 
   openSocket() {
-    io.on('connection', function (client) {
+    io.on('connection', (client) => {
       console.log('connected');
       client.on('message', (data) => this.onMessageReceive(data));
-      client.on('disconnect', () => onDisconnect());
+      // client.on('disconnect', () => onDisconnect());
     });
     
     io.listen(48765);
