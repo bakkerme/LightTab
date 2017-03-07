@@ -2,6 +2,8 @@ import './css/index.css';
 
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
+import { Provider } from 'react-redux'
+import { createStore } from 'redux'
 import CSSTransitionGroup from 'react-addons-css-transition-group';
 
 import Rheostat from 'rheostat';
@@ -20,10 +22,14 @@ class App extends Component {
         <Rheostat
           min={1}
           max={100}
+          values={[50]}
+          onValuesUpdated={(value) => console.log(value.values[0])}
         />
       </div>
     );
   }
 };
+
+let store = createStore();
 
 ReactDOM.render(<App />, document.getElementById('app'));
