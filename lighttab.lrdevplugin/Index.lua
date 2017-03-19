@@ -45,3 +45,4 @@ local handleImageChangeEvent = function (message)
 end
 
 Ltsocket.startReciever(handleImageChangeEvent)
+Ltsocket.startListener(handleImageChangeEvent)

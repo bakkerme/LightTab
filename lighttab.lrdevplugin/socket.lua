@@ -27,7 +27,7 @@ ltsocket.startReciever = function (onMessage)
           -- TODO
         end,
         onConnected = function( socket, port )
-          logger:trace('successful connection');
+          logger:trace('successful connection to sender');
         end,
         onMessage = function( socket, message )
           logger:trace('The message is:')
@@ -50,5 +50,44 @@ ltsocket.startReciever = function (onMessage)
     end )
   end ))
 end
+
+ltsocket.startSender = function (onConnectedCallback)
+  LrTasks.startAsyncTask(Debug.showErrors(  function()
+    Debug.callWithContext( 'socket_remote', function( context )
+    -- LrFunctionContext.callWithContext( 'socket_remote', function( context )
+      local running = true
+      local sender = LrSocket.bind {
+        functionContext = context,
+        port = 48764,
+        mode = "send",
+        plugin = _PLUGIN,
+        onConnecting = function( socket, port )
+          -- TODO
+        end,
+        onConnected = function( socket, port )
+          logger:trace('successful connection to reciever');
+          onConnectedCallback(socket)
+        end,
+        onMessage = function( socket, message )
+          -- Not used due to sender
+        end,
+        onClosed = function( socket )
+          running = false
+        end,
+        onError = function( socket, err )
+          if err == "timeout" then
+            socket:reconnect()
+          end
+        end,
+      }
+      while running do
+        LrTasks.sleep( 1/2 ) -- seconds
+      end
+      sender:close()
+    end )
+  end ))
+end
+
+
 
 return ltsocket;
