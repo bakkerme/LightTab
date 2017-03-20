@@ -13,7 +13,7 @@ local LrSocket = import "LrSocket"
 
 local ltsocket = {}
 
-ltsocket.startReciever = function (onMessage)
+ltsocket.startReciever = function (onMessageCallback)
   LrTasks.startAsyncTask(Debug.showErrors(  function()
     Debug.callWithContext( 'socket_remote', function( context )
     -- LrFunctionContext.callWithContext( 'socket_remote', function( context )
@@ -32,7 +32,7 @@ ltsocket.startReciever = function (onMessage)
         onMessage = function( socket, message )
           logger:trace('The message is:')
           logger:trace(message)
-          onMessage(message)
+          onMessageCallback(message)
         end,
         onClosed = function( socket )
           running = false

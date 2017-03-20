@@ -33,6 +33,11 @@ local setImageParamValue = function (devParam, value)
     LrDevelopController.setValue(devParam, value)
 end
 
+local handleMessageEvent = function (message)
+    local value = JSON:decode(message)
+    -- if(message.type === '') 
+end
+
 local handleImageChangeEvent = function (message)
     local value = JSON:decode(message)
     logger:trace('handle change')
@@ -44,5 +49,5 @@ local handleImageChangeEvent = function (message)
     end
 end
 
-Ltsocket.startReciever(handleImageChangeEvent)
-Ltsocket.startListener(handleImageChangeEvent)
+Ltsocket.startReciever(handleMessageEvent)
+-- Ltsocket.startListener(handleImageChangeEvent)
