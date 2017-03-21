@@ -1,29 +1,45 @@
+local Require = require "Require".path("../debuggingtoolkit.lrdevplugin").reload()
+local Debug = require "Debug"
+require "strict"
+
+local LrLogger = import 'LrLogger'
+local logger = LrLogger('LIGHTTAB')
+logger:enable("print")-- or "logfile"
+JSON = require "JSON.lua";
+
+
 Message = {}
 Message.__index = Message
 
 Message.TYPE = {
-  UPDATE_PARAM='PARAM_UPDATE',
+  UPDATE_PARAM='UPDATE_PARAM',
   REQUEST_PARAM_RANGE='REQUEST_PARAM_RANGE' 
 };
 
-function Message.new(init)
+function Message.new(type, payload)
   local self = setmetatable({}, Message)
-  local type = null;
-  local payload = null;
-end
-  
-function Account.constructor(type, payload)
   self.type = type;
   self.payload = payload;
+  return self;
 end
 
-function Account.transformToTransportable()
+function Message.parseTransportMessage(self, json)
+  local value = JSON:decode(json)
+  if value["type"] and value["payload"] then
+    self.type = value["type"] 
+    self.payload = value["payload"] 
+  end
+end
+  
+function Message.transformToTransportable(self)
     return {
       type=self.type,
       payload=this.payload 
     };
 end
 
-function Account.getPayload()
-    return this.payload;
+function Message.getPayload(self)
+    return self.payload;
 end
+
+return Message

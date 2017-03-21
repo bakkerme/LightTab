@@ -6,9 +6,10 @@ local LrDevelopController = import 'LrDevelopController'
 local LrLogger = import 'LrLogger'
 local logger = LrLogger('LIGHTTAB')
 logger:enable("print")-- or "logfile"
-JSON = require "JSON.lua";
+
 developmentParams = require "developmentParams.lua"
 Ltsocket = require "socket.lua"
+Message = require "message.lua"
 
 -- Debug.pauseIfAsked()
 -- if WIN_ENV == true then
@@ -33,19 +34,24 @@ local setImageParamValue = function (devParam, value)
     LrDevelopController.setValue(devParam, value)
 end
 
-local handleMessageEvent = function (message)
-    local value = JSON:decode(message)
-    -- if(message.type === '') 
-end
 
 local handleImageChangeEvent = function (message)
-    local value = JSON:decode(message)
+    -- Debug.pauseIfAsked()
     logger:trace('handle change')
-    logger:trace(value["param"])
+    logger:trace(message["param"])
     
-    if developmentParams:isAvailableDevelopmentParam(value["param"]) then
+    if developmentParams:isAvailableDevelopmentParam(message["param"]) then
         logger:trace("Available, applying now!")
-        setImageParamValue(value["param"], value["value"])
+        setImageParamValue(message["param"], message["value"])
+    end
+end
+
+local handleMessageEvent = function (message)
+    logger:trace(message);
+    local messageClass = Message.new()
+    messageClass:parseTransportMessage(message)
+    if messageClass['type'] == Message.TYPE['UPDATE_PARAM'] then
+        handleImageChangeEvent(messageClass:getPayload()) 
     end
 end
 
