@@ -32,10 +32,12 @@ function Message.parseTransportMessage(self, json)
 end
   
 function Message.transformToTransportable(self)
-    return {
+    local value = {
       type=self.type,
       payload=this.payload 
     };
+
+    return JSON:encode(value);
 end
 
 function Message.getPayload(self)

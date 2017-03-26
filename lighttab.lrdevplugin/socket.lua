@@ -88,6 +88,8 @@ ltsocket.startSender = function (onConnectedCallback)
   end ))
 end
 
-
+ltsocket.sendMessage = function(message, socket)
+  socket:send(message.transformToTransportable())
+end
 
 return ltsocket;

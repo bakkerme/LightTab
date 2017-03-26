@@ -5,11 +5,14 @@ require "strict"
 local LrDevelopController = import 'LrDevelopController'
 local LrLogger = import 'LrLogger'
 local logger = LrLogger('LIGHTTAB')
-logger:enable("print")-- or "logfile"
+logger:enable("print")
+-- or "logfile"
 
 developmentParams = require "developmentParams.lua"
 Ltsocket = require "socket.lua"
 Message = require "message.lua"
+
+local sendSocket
 
 -- Debug.pauseIfAsked()
 -- if WIN_ENV == true then
@@ -29,14 +32,30 @@ Message = require "message.lua"
 -- logger:trace( max )
 --Start the socket reciever
 
-local setImageParamValue = function (devParam, value)
-    logger:trace(devParam, value);
+local sendParamRange = function(param)
+    logger:trace('param to get range', param)
+    if developmentParams:isAvailableDevelopmentParam(param) then
+        local range = LrDevelopController.getRange(param)
+        local message = Message.new(
+            Message.TYPE['REQUEST_PARAM_RANGE'], 
+            {
+                param = devParam, 
+                value = range
+            }
+        )
+        
+        Ltsocket.sendMessage(message, socket);
+    end
+end
+
+--  -------------------- IMAGE CHANGE -------------------- --
+local setImageParamValue = function(devParam, value)
+    logger:trace(devParam, value)
+    
     LrDevelopController.setValue(devParam, value)
 end
 
-
-local handleImageChangeEvent = function (message)
-    -- Debug.pauseIfAsked()
+local handleImageChangeEvent = function(message)
     logger:trace('handle change')
     logger:trace(message["param"])
     
@@ -46,14 +65,23 @@ local handleImageChangeEvent = function (message)
     end
 end
 
-local handleMessageEvent = function (message)
-    logger:trace(message);
+local handleMessageEvent = function(message)
+    logger:trace(message)
     local messageClass = Message.new()
     messageClass:parseTransportMessage(message)
+    
     if messageClass['type'] == Message.TYPE['UPDATE_PARAM'] then
-        handleImageChangeEvent(messageClass:getPayload()) 
+        handleImageChangeEvent(messageClass:getPayload())
+    end
+    
+    if messageClass['type'] == Message.TYPE['REQUEST_PARAM_RANGE'] then
+        sendParamRange(messageClass['payload']['value'])
     end
 end
 
+local handleSenderConnected = function(socket)
+    sendSocket = socket
+end
+
 Ltsocket.startReciever(handleMessageEvent)
--- Ltsocket.startListener(handleImageChangeEvent)
+Ltsocket.startSender(handleSenderConnected)
