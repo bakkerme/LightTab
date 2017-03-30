@@ -35,12 +35,12 @@ local sendSocket
 local sendParamRange = function(param)
     logger:trace('param to get range', param)
     if developmentParams:isAvailableDevelopmentParam(param) then
-        local range = LrDevelopController.getRange(param)
+        local min,max = LrDevelopController.getRange(param)
         local message = Message.new(
             Message.TYPE['REQUEST_PARAM_RANGE'], 
             {
-                param = devParam, 
-                value = range
+                param = param, 
+                value = {min=min, max=max}
             }
         )
         
@@ -51,7 +51,6 @@ end
 --  -------------------- IMAGE CHANGE -------------------- --
 local setImageParamValue = function(devParam, value)
     logger:trace(devParam, value)
-    
     LrDevelopController.setValue(devParam, value)
 end
 
@@ -75,13 +74,13 @@ local handleMessageEvent = function(message)
     end
     
     if messageClass['type'] == Message.TYPE['REQUEST_PARAM_RANGE'] then
-        sendParamRange(messageClass['payload']['value'])
+        sendParamRange(messageClass:getPayload()['param'])
     end
 end
 
 local handleSenderConnected = function(socket)
     sendSocket = socket
+    socket:send('test\n')
 end
 
 Ltsocket.startReciever(handleMessageEvent)
-Ltsocket.startSender(handleSenderConnected)

@@ -2,43 +2,74 @@
 let _ = require('lodash');
 let net = require('net');
 
-const pluginPort = 48763;
+const pluginSendPort = 48763;
+const pluginRecievePort = 48799;
 const host = '127.0.0.1';
-let socketClient = null;
+
+let socketSendClient = null;
+let socketRecieve = null;
+let onMessageReceivedCallback = null
+
 class LocalSocket {
-  constructor() {
-    if (typeof pluginPort !== 'number') {
-      console.log(JSON.stringify(
-        {
-          status: 'error',
-          message: 'Provided port is invalid'
-        }
-      ));
-    }
+
+  openSocket() {
+    this.openSendSocket();
+    // this.openRecieveSocket();
+  }
+
+  /* Send */
+  openSendSocket() {
+    socketSendClient = new net.Socket();
+    socketSendClient.on('error', function (error) {
+      console.log('Error in Send:')
+      console.log(error);
+      setTimeout(this.openSocket.bind(this), 3000);
+    }.bind(this));
+    
+    socketSendClient.connect(pluginSendPort, host, function () {
+      console.log('CONNECTED TO SENDHOST: ' + host + ':' + pluginSendPort);
+    });
+
+    socketSendClient.on('data', function (data) {
+      console.log('DATA: ' + data);
+    });
+
+    socketSendClient.on('close', function () {
+      console.log('Connection closed');
+    });
   }
 
   sendObject(object) {
-    socketClient.write(JSON.stringify(object) + '\n');
+    socketSendClient.write(JSON.stringify(object) + '\n');
   }
 
-  openSocket() {
-    socketClient = new net.Socket();
-    socketClient.connect(pluginPort, host, function () {
-      console.log('CONNECTED TO: ' + host + ':' + pluginPort);
+  /* Recieve */
+  openRecieveSocket() {
+    socketRecieve = new net.Socket();
+    socketRecieve.on('error', function (error) {
+      console.log('Error in Recieve:')
+      console.log(error);
+      setTimeout(this.openSocket.bind(this), 3000);
+    }.bind(this));
+
+    socketRecieve.connect(pluginRecievePort, host, function () {
+      console.log('CONNECTED TO RECIEVEHOST: ' + host + ':' + pluginRecievePort);
     });
 
-    // Add a 'data' event handler for the client socket
-    // data is what the server sent to this socket
-    socketClient.on('data', function (data) {
-      console.log('DATA: ' + data);
-      // Close the client socket completely
-      // client.destroy();
+    socketRecieve.on('data', function (data) {
+      console.log(data.toString('utf-8'));
+      if (onMessageReceivedCallback) {
+        onMessageReceivedCallback(data);
+      }
     });
 
-    // Add a 'close' event handler for the client socket
-    socketClient.on('close', function () {
-      console.log('Connection closed');
+    socketRecieve.on('close', function () {
+      // console.log('Connection closed');
     });
+  }
+
+  registerOnMessageReceived(func) {
+    onMessageReceivedCallback = func;
   }
 }
 

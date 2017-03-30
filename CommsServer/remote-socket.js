@@ -4,18 +4,19 @@ const pluginPort = 48765;
 const io = require('socket.io')();
 let onMessageReceivedCallback = null
 class RemoteSocket {
-  constructor() {
-    if (typeof pluginPort !== 'number') {
-      console.log(JSON.stringify(
-        {
-          status: 'error',
-          message: 'Provided port is invalid'
-        }
-      ));
-    }
+  openSocket() {
+    io.on('connection', (client) => {
+      console.log('connected');
+      client.on('message', (data) => this.onMessageReceive(data));
+    });
+    
+    io.listen(48765);
   }
 
-  //@TODO probably genericise this out
+  sendObject(message) {
+    io.emit('message', message);
+  }
+
   registerOnMessageReceived(func) {
     onMessageReceivedCallback = func;
   }
@@ -27,16 +28,6 @@ class RemoteSocket {
 
   onDisconnect() {
     console.log('disconnect');
-  }
-
-  openSocket() {
-    io.on('connection', (client) => {
-      console.log('connected');
-      client.on('message', (data) => this.onMessageReceive(data));
-      // client.on('disconnect', () => onDisconnect());
-    });
-    
-    io.listen(48765);
   }
 }
 

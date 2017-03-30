@@ -18,7 +18,7 @@ ltsocket.startReciever = function (onMessageCallback)
     Debug.callWithContext( 'socket_remote', function( context )
     -- LrFunctionContext.callWithContext( 'socket_remote', function( context )
       local running = true
-      local sender = LrSocket.bind {
+      local reciever = LrSocket.bind {
         functionContext = context,
         port = 48763,
         mode = "receive",
@@ -27,7 +27,7 @@ ltsocket.startReciever = function (onMessageCallback)
           -- TODO
         end,
         onConnected = function( socket, port )
-          logger:trace('successful connection to sender');
+          logger:trace('successful connection, reciever');
         end,
         onMessage = function( socket, message )
           logger:trace('The message is:')
@@ -46,11 +46,13 @@ ltsocket.startReciever = function (onMessageCallback)
       while running do
         LrTasks.sleep( 1/2 ) -- seconds
       end
-      sender:close()
+      reciever:close()
     end )
   end ))
 end
 
+local maxSendConnections = 5
+local currentSendConnections = 0
 ltsocket.startSender = function (onConnectedCallback)
   LrTasks.startAsyncTask(Debug.showErrors(  function()
     Debug.callWithContext( 'socket_remote', function( context )
@@ -63,19 +65,23 @@ ltsocket.startSender = function (onConnectedCallback)
         plugin = _PLUGIN,
         onConnecting = function( socket, port )
           -- TODO
+          logger:trace('on connecting');
+          socket:send( "Hello world" )
         end,
         onConnected = function( socket, port )
-          logger:trace('successful connection to reciever');
+          logger:trace('successful connection, sender');
           onConnectedCallback(socket)
         end,
         onMessage = function( socket, message )
           -- Not used due to sender
         end,
         onClosed = function( socket )
+          logger:trace('closing sender');
           running = false
         end,
         onError = function( socket, err )
-          if err == "timeout" then
+          if err == "timeout" and currentSendConnections < maxSendConnections then
+            currentSendConnections = currentSendConnections+1 
             socket:reconnect()
           end
         end,
@@ -89,6 +95,7 @@ ltsocket.startSender = function (onConnectedCallback)
 end
 
 ltsocket.sendMessage = function(message, socket)
+  Debug.pauseIfAsked() 
   socket:send(message.transformToTransportable())
 end
 

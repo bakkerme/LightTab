@@ -6,16 +6,26 @@
 "strict mode";
 let LocalSocket = require('./local-socket.js');
 let RemoteSocket = require('./remote-socket.js');
+let HttpServer = require('./http-server');
 
 console.log(LocalSocket, RemoteSocket);
 
 let localSocket = new LocalSocket();
-let remoteSocket = new RemoteSocket();
+localSocket.registerOnMessageReceived((data) => relayMessageToRemoteSocket(data))
+// localSocket.openSocket();
 
-localSocket.openSocket();
+let httpServer = new HttpServer();
+httpServer.registerOnRequestRecieved((request, response) => console.log(request.data));
+httpServer.startServer();
+
+let remoteSocket = new RemoteSocket();
 remoteSocket.registerOnMessageReceived((data) => relayMessageToLocalSocket(data))
-remoteSocket.openSocket();
+// remoteSocket.openSocket();
 
 function relayMessageToLocalSocket(message) {
   localSocket.sendObject(message);
+}
+
+function relayMessageToRemoteSocket(message) {
+  remoteSocket.sendObject(message);
 }
