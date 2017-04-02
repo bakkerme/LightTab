@@ -4,6 +4,7 @@ require "strict"
 
 local LrDevelopController = import 'LrDevelopController'
 local LrLogger = import 'LrLogger'
+local LrHttp = import "LrHttp"
 local logger = LrLogger('LIGHTTAB')
 logger:enable("print")
 -- or "logfile"
@@ -35,16 +36,24 @@ local sendSocket
 local sendParamRange = function(param)
     logger:trace('param to get range', param)
     if developmentParams:isAvailableDevelopmentParam(param) then
-        local min,max = LrDevelopController.getRange(param)
-        local message = Message.new(
-            Message.TYPE['REQUEST_PARAM_RANGE'], 
-            {
-                param = param, 
-                value = {min=min, max=max}
-            }
-        )
+        logger:trace('found value')
+        local min, max = LrDevelopController.getRange(param)
+        local message = Message.new(Message.TYPE['REQUEST_PARAM_RANGE'], {param = param, value = {min = min, max = max}})
+        local transformedMessage = message.transformToTransportable(message);
+        logger:trace('got message')
         
-        Ltsocket.sendMessage(message, socket);
+        local headers = {
+            {field = 'Content-Length', value = string.len(transformedMessage)}, 
+        }
+        
+        logger:trace('got headers')
+        
+        import "LrTasks".startAsyncTask(
+            function()
+                logger:trace('start post')
+                LrHttp.post("http://localhost:48764", transformedMessage, headers)
+            end
+        )
     end
 end
 

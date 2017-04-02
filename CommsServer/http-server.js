@@ -22,13 +22,13 @@ class HttpServer {
         });
 
         request.on('end', function () {
-          let post = qs.parse(body);
+          if (body) {
+            let body = qs.parse(body);
+            if (this.onRequestCallback) {
+              this.onRequestCallback(body);
+            }
+          }
         });
-      }
-
-      if (this.onRequestCallback) {
-        this.onRequestCallback(request, response);
-        response.end('It Works!! Path Hit: ' + request.url);
       }
     });
 

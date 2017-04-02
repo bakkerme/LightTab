@@ -95,7 +95,6 @@ ltsocket.startSender = function (onConnectedCallback)
 end
 
 ltsocket.sendMessage = function(message, socket)
-  Debug.pauseIfAsked() 
   socket:send(message.transformToTransportable())
 end
 

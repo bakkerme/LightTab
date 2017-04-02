@@ -11,21 +11,21 @@ let HttpServer = require('./http-server');
 console.log(LocalSocket, RemoteSocket);
 
 let localSocket = new LocalSocket();
-localSocket.registerOnMessageReceived((data) => relayMessageToRemoteSocket(data))
-// localSocket.openSocket();
+localSocket.openSocket();
 
 let httpServer = new HttpServer();
-httpServer.registerOnRequestRecieved((request, response) => console.log(request.data));
+httpServer.registerOnRequestRecieved((request, response) => relayMessageToRemoteSocket(request.data));
 httpServer.startServer();
 
 let remoteSocket = new RemoteSocket();
 remoteSocket.registerOnMessageReceived((data) => relayMessageToLocalSocket(data))
-// remoteSocket.openSocket();
+remoteSocket.openSocket();
 
 function relayMessageToLocalSocket(message) {
   localSocket.sendObject(message);
 }
 
 function relayMessageToRemoteSocket(message) {
+  console.log(message);
   remoteSocket.sendObject(message);
 }

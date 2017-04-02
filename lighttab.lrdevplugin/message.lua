@@ -34,7 +34,7 @@ end
 function Message.transformToTransportable(self)
     local value = {
       type=self.type,
-      payload=this.payload 
+      payload=self.payload 
     };
 
     return JSON:encode(value);
