@@ -21,9 +21,8 @@ class HttpServer {
             request.connection.destroy();
         });
 
-        request.on('end', function () {
+        request.on('end', () => {
           if (body) {
-            let body = qs.parse(body);
             if (this.onRequestCallback) {
               this.onRequestCallback(body);
             }

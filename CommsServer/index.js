@@ -14,7 +14,7 @@ let localSocket = new LocalSocket();
 localSocket.openSocket();
 
 let httpServer = new HttpServer();
-httpServer.registerOnRequestRecieved((request, response) => relayMessageToRemoteSocket(request.data));
+httpServer.registerOnRequestRecieved((request, response) => relayMessageToRemoteSocket(request));
 httpServer.startServer();
 
 let remoteSocket = new RemoteSocket();
@@ -26,6 +26,6 @@ function relayMessageToLocalSocket(message) {
 }
 
 function relayMessageToRemoteSocket(message) {
-  console.log(message);
+  console.log('relaying to remote', message);
   remoteSocket.sendObject(message);
 }

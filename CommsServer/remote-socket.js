@@ -22,7 +22,6 @@ class RemoteSocket {
   }
 
   onMessageReceive(data) {
-    console.log(data);
     onMessageReceivedCallback(data);
   }
 
