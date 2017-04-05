@@ -22,12 +22,20 @@ class HttpServer {
         });
 
         request.on('end', () => {
+          response.writeHead(200, { "Content-Type": "text/html" });
+          response.write(JSON.stringify({ status: 'ok' }));
+          response.end();
+
           if (body) {
             if (this.onRequestCallback) {
               this.onRequestCallback(body);
             }
           }
         });
+      } else {
+        response.writeHead(200, { "Content-Type": "text/html" });
+        response.write(JSON.stringify({ status: 'ok' }));
+        response.end();
       }
     });
 

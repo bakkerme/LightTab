@@ -36,17 +36,13 @@ local sendSocket
 local sendParamRange = function(param)
     logger:trace('param to get range', param)
     if developmentParams:isAvailableDevelopmentParam(param) then
-        logger:trace('found value')
         local min, max = LrDevelopController.getRange(param)
         local message = Message.new(Message.TYPE['REQUEST_PARAM_RANGE'], {param = param, value = {min = min, max = max}})
         local transformedMessage = message.transformToTransportable(message);
-        logger:trace('got message')
         
         local headers = {
             {field = 'Content-Length', value = string.len(transformedMessage)}, 
         }
-        
-        logger:trace('got headers')
         
         import "LrTasks".startAsyncTask(
             function()
@@ -74,7 +70,6 @@ local handleImageChangeEvent = function(message)
 end
 
 local handleMessageEvent = function(message)
-    logger:trace(message)
     local messageClass = Message.new()
     messageClass:parseTransportMessage(message)
     
