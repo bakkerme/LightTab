@@ -37,7 +37,17 @@ local sendParamRange = function(param)
     logger:trace('param to get range', param)
     if developmentParams:isAvailableDevelopmentParam(param) then
         local min, max = LrDevelopController.getRange(param)
-        local message = Message.new(Message.TYPE['REQUEST_PARAM_RANGE'], {param = param, value = {min = min, max = max}})
+        local value = LrDevelopController.getValue(param)
+        local message = Message.new(Message.TYPE['REQUEST_PARAM_RANGE'], 
+            {
+                param = param, 
+                value = {
+                    min = min, 
+                    max = max,
+                    value = value
+                }
+            }
+        )
         local transformedMessage = message.transformToTransportable(message);
         
         local headers = {
@@ -56,6 +66,7 @@ end
 --  -------------------- IMAGE CHANGE -------------------- --
 local setImageParamValue = function(devParam, value)
     logger:trace(devParam, value)
+    LrDevelopController.startTracking(devParam)
     LrDevelopController.setValue(devParam, value)
 end
 
